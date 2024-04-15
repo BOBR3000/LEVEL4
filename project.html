@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Bitcoin Exchange Panel</title>
+		<!-- Подключение Vue.js -->
+		<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+		<!-- Подключение Vuetify CSS -->
+		<link
+			href="https://cdn.jsdelivr.net/npm/vuetify@2.5.9/dist/vuetify.min.css"
+			rel="stylesheet"/>
+		<!-- Подключение Vuetify JS -->
+		<script src="https://cdn.jsdelivr.net/npm/vuetify@2.5.9/dist/vuetify.js"></script>
+	</head>
+	<body>
+		<div id="app">
+			<v-app>
+				<v-container fluid>
+					<v-row justify="center">
+						<v-col cols="12" sm="8" md="6">
+							<v-card color="grey lighten-3">
+								<v-card-title
+									class="headline"
+									style="background-color: rgba(0, 255, 0, 0.3)"
+									>Курс биткоина</v-card-title
+								>
+								<v-card-text>
+									<v-container fluid>
+										<v-row>
+											<v-col cols="6">
+												<v-list>
+													<v-list-item>
+														<v-list-item-content
+															style="background-color: rgba(0, 255, 0, 0.3)"
+														>
+															<v-list-item-title
+																>Относительно рубля (BTC/RUB)</v-list-item-title
+															>
+														</v-list-item-content>
+													</v-list-item>
+													<v-list-item>
+														<v-list-item-content
+															style="background-color: rgba(0, 255, 0, 0.3)"
+														>
+															<v-list-item-title
+																>Относительно доллара
+																(BTC/USD)</v-list-item-title
+															>
+														</v-list-item-content>
+													</v-list-item>
+												</v-list>
+											</v-col>
+											<v-col cols="6">
+												<v-list>
+													<v-list-item>
+														<v-list-item-content class="text-right"
+															>{{ bitcoinRates.rub }} ₽</v-list-item-content
+														>
+													</v-list-item>
+													<v-list-item>
+														<v-list-item-content class="text-right"
+															>{{ bitcoinRates.usd }} $</v-list-item-content
+														>
+													</v-list-item>
+												</v-list>
+											</v-col>
+										</v-row>
+									</v-container>
+								</v-card-text>
+							</v-card>
+						</v-col>
+					</v-row>
+				</v-container>
+			</v-app>
+		</div>
+
+		<script>
+			new Vue({
+				el: '#app',
+				vuetify: new Vuetify(),
+				data() {
+					return {
+						bitcoinRates: {
+							rub: 0,
+							usd: 0,
+						},
+					}
+				},
+				created() {
+					// Функция для получения актуального курса биткоина
+					const fetchBitcoinRates = () => {
+						// Запрос к API для получения актуального курса биткоина относительно рубля
+						fetch('https://api.coindesk.com/v1/bpi/currentprice/RUB.json')
+							.then(response => response.json())
+							.then(data => {
+								// Обновляем данные курса биткоина относительно рубля
+								this.bitcoinRates.rub = data.bpi.RUB.rate_float
+							})
+							.catch(error => {
+								console.error(
+									'Ошибка при получении курса биткоина относительно рубля:',
+									error
+								)
+							})
+
+						// Запрос к API для получения актуального курса биткоина относительно доллара
+						fetch('https://api.coindesk.com/v1/bpi/currentprice/USD.json')
+							.then(response => response.json())
+							.then(data => {
+								// Обновляем данные курса биткоина относительно доллара
+								this.bitcoinRates.usd = data.bpi.USD.rate_float
+							})
+							.catch(error => {
+								console.error(
+									'Ошибка при получении курса биткоина относительно доллара:',
+									error
+								)
+							})
+					}
+
+					// Получение актуального курса биткоина при загрузке страницы
+					fetchBitcoinRates()
+
+					// Обновление курса биткоина при перезагрузке страницы
+					window.addEventListener('focus', fetchBitcoinRates)
+				},
+			})
+		</script>
+	</body>
+</html>
